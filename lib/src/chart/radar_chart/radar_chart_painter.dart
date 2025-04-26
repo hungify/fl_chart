@@ -192,8 +192,11 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
       ..strokeWidth = data.tickBorderData.width;
 
     /// draw radar ticks
-    ticks.sublist(0, ticks.length - 1).asMap().forEach(
+    final lastTickIndex =
+        data.showMaxTickLabel ? ticks.length : ticks.length - 1;
+    ticks.asMap().forEach(
       (index, tick) {
+        if (index >= lastTickIndex) return;
         final tickRadius =
             tickDistance * (index + (data.isMinValueAtCenter ? 0 : 1));
         if (data.radarShape == RadarShape.circle) {
@@ -205,9 +208,12 @@ class RadarChartPainter extends BaseChartPainter<RadarChartData> {
           );
         }
 
+        final tickLabel = data.tickLabelFormatter != null
+            ? data.tickLabelFormatter!(tick, index)
+            : tick.toStringAsFixed(1);
         _ticksTextPaint
           ..text = TextSpan(
-            text: tick.toStringAsFixed(1),
+            text: tickLabel,
             style: Utils().getThemeAwareTextStyle(context, data.ticksTextStyle),
           )
           ..textDirection = TextDirection.ltr

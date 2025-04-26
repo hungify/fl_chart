@@ -75,7 +75,11 @@ class RadarChartData extends BaseChartData with EquatableMixin {
     BorderSide? gridBorderData,
     RadarTouchData? radarTouchData,
     this.isMinValueAtCenter = false,
+    this.showMaxTickLabel = false,
+    this.tickLabelFormatter,
     super.borderData,
+    this.max,
+    this.min,
   })  : assert(dataSets != null && dataSets.hasEqualDataEntriesLength),
         assert(
           tickCount == null || tickCount >= 1,
@@ -109,6 +113,12 @@ class RadarChartData extends BaseChartData with EquatableMixin {
 
   /// [radarShape] is used to draw [RadarChart] border and background
   final RadarShape radarShape;
+
+  /// [max] is the maximum value entry in the radar chart
+  final RadarEntry? max;
+
+  /// [min] is the minimum value entry in the radar chart
+  final RadarEntry? min;
 
   /// [getTitle] is used to draw titles outside the [RadarChart]
   /// [getTitle] is type of [GetTitleByIndexFunction] so you should return a valid [RadarChartTitle]
@@ -160,12 +170,21 @@ class RadarChartData extends BaseChartData with EquatableMixin {
   /// If [isMinValueAtCenter] is true, the minimum value of the [RadarChart] will be at the center of the chart.
   final bool isMinValueAtCenter;
 
+  /// Determines whether to show label for the max tick value.
+  /// If true, label for max value will be shown. If false, it will be hidden (default: false for backward compatibility).
+  final bool showMaxTickLabel;
+
+  /// Optional: Custom formatter for tick label. If null, use default toStringAsFixed(1).
+  final String Function(double value, int index)? tickLabelFormatter;
+
   /// [titleCount] we use this value to determine number of [RadarChart] grid or lines.
   int get titleCount => dataSets[0].dataEntries.length;
 
   /// defines the maximum [RadarEntry] value in all [dataSets]
   /// we use this value to calculate the maximum value of ticks.
   RadarEntry get maxEntry {
+    if (max != null) return max!;
+
     var maximum = dataSets.first.dataEntries.first;
 
     for (final dataSet in dataSets) {
@@ -179,6 +198,8 @@ class RadarChartData extends BaseChartData with EquatableMixin {
   /// defines the minimum [RadarEntry] value in all [dataSets]
   /// we use this value to calculate the minimum value of ticks.
   RadarEntry get minEntry {
+    if (min != null) return min!;
+
     var minimum = dataSets.first.dataEntries.first;
 
     for (final dataSet in dataSets) {
@@ -206,6 +227,8 @@ class RadarChartData extends BaseChartData with EquatableMixin {
     BorderSide? gridBorderData,
     RadarTouchData? radarTouchData,
     bool? isMinValueAtCenter,
+    bool? showMaxTickLabel,
+    String Function(double value, int index)? tickLabelFormatter,
     FlBorderData? borderData,
   }) =>
       RadarChartData(
@@ -223,6 +246,8 @@ class RadarChartData extends BaseChartData with EquatableMixin {
         gridBorderData: gridBorderData ?? this.gridBorderData,
         radarTouchData: radarTouchData ?? this.radarTouchData,
         isMinValueAtCenter: isMinValueAtCenter ?? this.isMinValueAtCenter,
+        showMaxTickLabel: showMaxTickLabel ?? this.showMaxTickLabel,
+        tickLabelFormatter: tickLabelFormatter ?? this.tickLabelFormatter,
         borderData: borderData ?? this.borderData,
       );
 
@@ -274,6 +299,8 @@ class RadarChartData extends BaseChartData with EquatableMixin {
         gridBorderData,
         radarTouchData,
         isMinValueAtCenter,
+        showMaxTickLabel,
+        tickLabelFormatter,
       ];
 }
 
